@@ -1,0 +1,188 @@
+<!doctype html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- build:css(.) styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <style type="text/css" media="screen">
+      body{
+        background: #222;
+        color: #fff;
+      }
+      #map-canvas {
+        height: 600px;
+        margin: 0px;
+        padding: 0px
+      }
+      </style>
+    <!-- endbuild -->
+  </head>
+  <body ng-app="positionEmitterApp">
+    <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <!-- Add your site or application content here -->
+    <div class="container" ng-controller="MainCtrl as main">
+      <div class="header">
+        <!-- <ul class="nav nav-pills pull-right">
+          <li class="active"><a ng-href="#">Home</a></li>
+          <li><a ng-href="#">About</a></li>
+          <li><a ng-href="#">Contact</a></li>
+        </ul> -->
+        <h2 class="text-muted">Position Emitter</h2>
+      </div>
+
+
+      <!-- <div ng-include="'views/main.html'" ng-controller="MainCtrl as main"></div> -->
+
+      <div id="map-canvas"></div>
+      <br>
+      <div role="tabpanel">
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" ng-class="{active: main.active == 'settings'}" ng-click="main.active = 'settings'"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
+          <li role="presentation"><a href="#connection" aria-controls="connection" role="tab" data-toggle="tab">Connection</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="settings">
+            <h2>Settings</h2>
+            <form name="settingsForm" novalidate>
+              
+              <div class="form-group">
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="settingsRadios" id="settingsRadios1" value="oneByOne" ng-model="main.messageType" ng-click="main.messageDelay = 3000">
+                    Every set of coordinates will be sent independently
+                  </label>
+                </div>
+                <p class="help-block">You'll need to choose a delay for the requests</p>
+              </div>
+
+              <div class="form-group" ng-if="main.messageType === 'oneByOne'">
+                <input type="number" class="form-control" ng-model="main.messageDelay" step="1000">
+                <p class="help-block">Time as milliseconds</p>
+              </div>
+
+              <div class="form-group">
+                <div class="radio">
+                  <label>
+                    <input type="radio" name="settingsRadios" id="settingsRadios2" value="allThePositions" ng-model="main.messageType">
+                    Send all the positions at once
+                  </label>
+                </div>
+                <p class="help-block">The whole array of coordinates will be sent in one single request</p>
+              </div>
+
+              <div class="form-group">
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" name="splitCheckbox" id="splitCheckbox" ng-model="main.split" ng-click="main.splitIn = 30" ng-disabled="main.gpsPositions.length>2">
+                   Generate a sub set of coordinates between those two points
+                  </label>
+                </div>
+                <!-- <p class="help-block"></p> -->
+              </div>
+
+              <div class="form-group" ng-if="main.split">
+                <input type="number" class="form-control" ng-model="main.splitIn" step="1">
+                <p class="help-block">Split the two positions into {{main.splitIn}} points</p>
+              </div>
+
+
+              <button type="submit" class="btn btn-success" ng-click="main.processMessage(main.messageType, main.split)" ng-disabled="!main.messageType">Go!</button>
+            </form>
+            
+            <br>
+            <div ng-if="main.gpsPositions.length>0">
+              <hr>
+              <h3>Raw coordinates</h3>
+              <pre class="well">{{main.gpsPositions}}</pre>
+            </div>
+
+          </div>
+
+          <!-- ****************************************************************** -->
+          <div role="tabpanel" class="tab-pane" id="connection"  ng-class="{active: main.active == 'connection'}" ng-click="main.active = 'connection'">
+            <form name="settingsForm" novalidate>
+              
+              <div class="form-group">
+                <label for="wsAddr">Web Socket server address</label>
+                  <input type="text" id="wsAddr" class="form-control" ng-model="main.wsServerAddress" ng-click="main.messageDelay = 3000">
+                <!-- <p class="help-block"></p> -->
+              </div>
+
+              <div class="form-group">
+                <label for="requestObj">Request Object</label>
+                  <textarea id="requestObj" class="form-control" rows="3"></textarea>
+                <!-- <p class="help-block"></p> -->
+              </div>
+
+
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+      
+
+
+
+      <div class="footer">
+        <p><a href="https://twitter.com/unjavascripter">@UnJavaScripter</a></p>
+      </div>
+    </div>
+
+
+    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
+     <script>
+       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+       ga('create', 'UA-XXXXX-X');
+       ga('send', 'pageview');
+    </script>
+
+    <!-- build:js(.) scripts/oldieshim.js -->
+    <!--[if lt IE 9]>
+    <script src="bower_components/es5-shim/es5-shim.js"></script>
+    <script src="bower_components/json3/lib/json3.js"></script>
+    <![endif]-->
+    <!-- endbuild -->
+<script src='https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=drawing'></script>
+    <!-- build:js(.) scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-touch/angular-touch.js"></script>
+    <script src="bower_components/lodash/dist/lodash.compat.js"></script>
+    <script src="bower_components/angular-google-maps/dist/angular-google-maps.js"></script>
+    <!-- endbower -->
+    
+    <!-- endbuild -->
+
+        <!-- build:js({.tmp,app}) scripts/scripts.js -->
+        <script src="scripts/app.js"></script>
+        <script src="scripts/factories/webSocket_Factory.js"></script>
+        <script src="scripts/controllers/main.js"></script>
+        <!-- endbuild -->
+</body>
+</html>
