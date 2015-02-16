@@ -23,10 +23,14 @@
 
 	 	vm.active = 'options';
 
-		vm.wsServerAddress = 'ws://echo.websocket.org';
+		vm.wsServerAddress = 'wss://chat.tappsi.co';
 
 		var messageObj = {
-	        "body": ""
+	        "body": "",
+	        	            "userid":"gpsPosUser",
+	            "user":"test",
+	            "msg_id":(~~(Math.random() * 1e9)) + '01',
+	            "channel":"5snlgg"
 		};
 
 
@@ -91,7 +95,6 @@
 			}
 			else if(options.messageType === "oneByOne" && vm.gpsPositions.length > 1){
 				vm.gpsPositions.doEveryX(function(element, index){
-					console.log(index);
 					messageObj.body = JSON.stringify(element);
 					sendMessage(messageObj)
 				}, options.delay);
@@ -117,8 +120,9 @@
 			if(vm.gpsPositions.length === 2){
 				newPositionArr.push(vm.gpsPositions[0])
 				for(var i=0 ; i < splitIn ; i++){
-					var intermediate_lat = vm.gpsPositions[0].lat + ((vm.gpsPositions[1].lat - vm.gpsPositions[0].lat)/(splitIn-i));
-					var intermediate_lng = vm.gpsPositions[0].lng + ((vm.gpsPositions[1].lng - vm.gpsPositions[0].lng)/(splitIn-i));
+
+					var intermediate_lat = vm.gpsPositions[0].lat + (((vm.gpsPositions[1].lat - vm.gpsPositions[0].lat)/(splitIn)) * i);
+					var intermediate_lng = vm.gpsPositions[0].lng + (((vm.gpsPositions[1].lng - vm.gpsPositions[0].lng)/(splitIn)) * i);
 					console.log(intermediate_lat);
 					console.log(intermediate_lng);
 					newPositionArr.push({"lat": intermediate_lat,"lng": intermediate_lng});
